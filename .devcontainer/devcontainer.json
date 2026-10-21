@@ -5,9 +5,10 @@
   "portsAttributes": {
     "8088": {
       "label": "BiteShare Web App",
-      "onAutoForward": "openBrowser"
+      "onAutoForward": "openBrowser",
+      "visibility": "public"
     }
   },
   "postCreateCommand": "pip install -r requirements.txt",
-  "postStartCommand": "python server.py"
+  "postStartCommand": "nohup python server.py > /tmp/server.log 2>&1 &"
 }
