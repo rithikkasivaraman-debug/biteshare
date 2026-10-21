@@ -4,6 +4,7 @@
 [![SAP BTP Ready](https://img.shields.io/badge/SAP%20BTP-Cloud%20Foundry-008FD3?style=flat&logo=sap&logoColor=white)](https://www.sap.com/products/technology-platform.html)
 [![Salesforce Integrated](https://img.shields.io/badge/Salesforce-Lightning%20%26%20Apex-00A1E0?style=flat&logo=salesforce&logoColor=white)](https://developer.salesforce.com/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Open in GitHub Codespaces](https://github.com/codespaces/badge.svg)](https://codespaces.new/rithikkasivaraman-debug/biteshare)
 
 > **BiteShare** is an enterprise-grade surplus food management and volunteer logistics automation platform. It bridges commercial food donors (hotels, banquets, restaurants, cafeterias) with verified recipient NGOs and a community-driven volunteer rescue pool, backed by bi-directional Salesforce synchronization and SAP BTP deployment readiness.
 
