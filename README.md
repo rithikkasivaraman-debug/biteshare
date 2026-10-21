@@ -1,5 +1,7 @@
 # 🍲 BiteShare — Surplus Food Sharing & Logistics Network
 
+[![Live Website](https://img.shields.io/badge/Live%20Website-Visit%20BiteShare-10b981?style=for-the-badge&logo=githubpages&logoColor=white)](https://rithikkasivaraman-debug.github.io/biteshare/)
+
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-3776AB?style=flat&logo=python&logoColor=white)](https://www.python.org/)
 [![SAP BTP Ready](https://img.shields.io/badge/SAP%20BTP-Cloud%20Foundry-008FD3?style=flat&logo=sap&logoColor=white)](https://www.sap.com/products/technology-platform.html)
 [![Salesforce Integrated](https://img.shields.io/badge/Salesforce-Lightning%20%26%20Apex-00A1E0?style=flat&logo=salesforce&logoColor=white)](https://developer.salesforce.com/)
