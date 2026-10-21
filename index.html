@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BiteShare | Connected to Salesforce</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --primary: #0284c7;
+      --primary-dark: #0369a1;
+      --sf-blue: #0176d3;
+      --donor-accent: #0284c7;
+      --recipient-accent: #7c3aed;
+      --volunteer-accent: #16a34a;
+      --bg: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --border: #e2e8f0;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; }
+    body { background-color: var(--bg); color: var(--text-main); display: flex; flex-direction: column; min-height: 100vh; }
+
+    /* Top Connected Bar */
+    .sf-sync-banner {
+      background: #032d60;
+      color: #bae6fd;
+      padding: 6px 1.5rem;
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #0c4a6e;
+    }
+    .sf-badge { background: #0284c7; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 0.72rem; }
+
+    /* Header */
+    header.app-header {
+      background: #0f172a;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.75rem;
+      height: 60px;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      box-shadow: 0 4px 12px rgba(15, 23, 42, 0.12);
+    }
+    .brand-wrap { display: flex; align-items: center; gap: 12px; }
+    .brand-icon {
+      background: linear-gradient(135deg, #0176d3, #0284c7);
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 1.1rem;
+    }
+    .brand-title { font-weight: 800; font-size: 1.2rem; letter-spacing: -0.5px; }
+    .header-actions { display: flex; align-items: center; gap: 10px; }
+
+    /* Tabs */
+    nav.app-nav {
+      background: #ffffff;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      gap: 6px;
+      padding: 0 1.5rem;
+      overflow-x: auto;
+    }
+    .nav-item {
+      padding: 13px 16px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .nav-item:hover { color: var(--primary); }
+    .nav-item.active { color: var(--primary); border-bottom-color: var(--primary); font-weight: 700; }
+    .nav-item.sf.active { color: var(--sf-blue); border-bottom-color: var(--sf-blue); }
+
+    /* Main Container */
+    main.main-content { max-width: 1380px; width: 100%; margin: 1.25rem auto; padding: 0 1.25rem; flex: 1; }
+
+    /* KPI Highlights */
+    .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1rem; margin-bottom: 1.25rem; }
+    .kpi-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      padding: 1.15rem;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+    .kpi-card::before { content:''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; background: var(--primary); }
+    .kpi-card.green::before { background: var(--success); }
+    .kpi-card.blue::before { background: var(--sf-blue); }
+    .kpi-label { font-size: 0.76rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+    .kpi-value { font-size: 1.95rem; font-weight: 800; color: var(--text-main); margin: 4px 0; letter-spacing: -0.5px; }
+    .kpi-subtext { font-size: 0.76rem; color: var(--text-muted); }
+
+    /* Content Cards */
+    .content-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      box-shadow: var(--shadow-sm);
+      margin-bottom: 1.25rem;
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 0.95rem 1.3rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: #fafbfc;
+    }
+    .card-header h2 { font-size: 1.02rem; font-weight: 700; color: var(--text-main); display: flex; align-items: center; gap: 8px; }
+    .card-body { padding: 1.3rem; }
+
+    /* Forms */
+    .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 1.15rem; }
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+    .form-group label { font-size: 0.8rem; font-weight: 700; color: var(--text-main); }
+    .form-control {
+      padding: 8px 12px;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      font-size: 0.88rem;
+      outline: none;
+      background: #ffffff;
+    }
+    .form-control:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15); }
+
+    /* Buttons */
+    .btn {
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      font-size: 0.83rem;
+      font-weight: 700;
+      cursor: pointer;
+      border: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+    .btn-primary { background: var(--primary); color: #fff; }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-sf { background: var(--sf-blue); color: #fff; }
+    .btn-sf:hover { background: #014486; }
+    .btn-donor { background: var(--donor-accent); color: #fff; }
+    .btn-donor:hover { background: #0369a1; }
+    .btn-recipient { background: var(--recipient-accent); color: #fff; }
+    .btn-recipient:hover { background: #6d28d9; }
+    .btn-volunteer { background: var(--volunteer-accent); color: #fff; }
+    .btn-volunteer:hover { background: #15803d; }
+    .btn-success { background: var(--success); color: #fff; }
+    .btn-warning { background: var(--warning); color: #fff; }
+    .btn-outline { background: transparent; border: 1px solid var(--border); color: var(--text-main); }
+    .btn-outline:hover { background: #f1f5f9; }
+    .btn-disabled { background: #f1f5f9; color: #94a3b8; border: 1px solid #e2e8f0; cursor: not-allowed; }
+    .btn-sm { padding: 4px 10px; font-size: 0.76rem; border-radius: 5px; }
+
+    /* Tables */
+    .data-table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.86rem; }
+    .data-table th { background: #f8fafc; padding: 11px 13px; border-bottom: 2px solid var(--border); color: var(--text-muted); font-weight: 700; font-size: 0.77rem; text-transform: uppercase; }
+    .data-table td { padding: 11px 13px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+    .data-table tr:hover { background: #fcfcfd; }
+
+    /* Badges */
+    .badge-status { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 20px; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; }
+    .badge-submitted { background: #e0f2fe; color: #0369a1; }
+    .badge-matched { background: #fef3c7; color: #b45309; }
+    .badge-vol_assigned { background: #e0f2fe; color: #0284c7; }
+    .badge-picked_up { background: #fef9c3; color: #a16207; }
+    .badge-delivered, .badge-completed { background: #dcfce7; color: #166534; }
+
+    /* Stepper Track */
+    .stepper-track { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #fafbfc; border-radius: var(--radius-sm); border: 1px solid var(--border); margin-bottom: 1rem; }
+    .step-node { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 6px; position: relative; z-index: 2; flex: 1; }
+    .step-bubble { width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.8rem; font-weight: bold; background: #e2e8f0; color: #64748b; }
+    .step-node.done .step-bubble { background: var(--success); color: #fff; }
+    .step-node.active .step-bubble { background: var(--primary); color: #fff; }
+    .step-label { font-size: 0.75rem; font-weight: 700; color: var(--text-muted); }
+    .step-node.done .step-label, .step-node.active .step-label { color: var(--text-main); }
+    .step-line { height: 3px; background: #e2e8f0; flex: 1; margin: 0 -10px 18px -10px; z-index: 1; }
+    .step-line.done { background: var(--success); }
+
+    /* Terminal Log */
+    .log-terminal { max-height: 180px; overflow-y: auto; background: #0f172a; color: #38bdf8; padding: 12px; border-radius: var(--radius-sm); font-family: ui-monospace, "Cascadia Code", monospace; font-size: 0.8rem; line-height: 1.5; }
+    .log-item { margin-bottom: 4px; }
+    .log-item .time { color: #64748b; }
+    .log-item .tag { color: #facc15; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+  <!-- Live Salesforce Sync Banner -->
+  <div class="sf-sync-banner">
+    <div style="display:flex; align-items:center; gap:8px;">
+      <i class="fa-brands fa-salesforce" style="font-size:1.15rem; color:#38bdf8;"></i>
+      <span><strong>Salesforce Integration Bridge:</strong> Connected & Listening</span>
+      <span class="sf-badge">Bi-Directional</span>
+    </div>
+    <div style="font-size:0.75rem;">
+      <span>Webhook: <code>https://theaters-eric-portable-recipient.trycloudflare.com/api/salesforce/webhook</code></span>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="brand-wrap">
+      <div class="brand-icon"><i class="fa-brands fa-salesforce"></i></div>
+      <div>
+        <span class="brand-title">BiteShare</span>
+        <span class="sf-badge" style="background:#0176d3; margin-left:6px;">Salesforce Connected</span>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-sf btn-sm" onclick="simulateSalesforcePush()"><i class="fa-brands fa-salesforce"></i> Push from Salesforce (Simulate)</button>
+      <button class="btn btn-outline btn-sm" style="color:#fff; border-color:#475569;" onclick="resetDemo()"><i class="fa-solid fa-rotate-right"></i> Reset</button>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="app-nav">
+    <div class="nav-item donor active" onclick="switchTab('donor')">
+      <i class="fa-solid fa-hand-holding-heart"></i> 1. Donor Section
+    </div>
+    <div class="nav-item recipient" onclick="switchTab('recipient')">
+      <i class="fa-solid fa-building-ngo"></i> 2. Recipient Section (NGOs)
+    </div>
+    <div class="nav-item volunteer" onclick="switchTab('volunteer')">
+      <i class="fa-solid fa-motorcycle"></i> 3. Volunteer Section
+    </div>
+    <div class="nav-item" onclick="switchTab('tracking')">
+      <i class="fa-solid fa-route"></i> 4. Delivery Tracking
+    </div>
+    <div class="nav-item sf" onclick="switchTab('salesforce')">
+      <i class="fa-brands fa-salesforce"></i> 5. Salesforce Integration
+    </div>
+    <div class="nav-item" onclick="switchTab('volunteers')">
+      <i class="fa-solid fa-users"></i> Volunteer Pool (25)
+    </div>
+    <div class="nav-item" onclick="switchTab('recipients')">
+      <i class="fa-solid fa-hotel"></i> NGOs & Shelters (17)
+    </div>
+    <div class="nav-item" onclick="switchTab('analytics')">
+      <i class="fa-solid fa-chart-pie"></i> Impact Analysis
+    </div>
+  </nav>
+
+  <!-- Main Container -->
+  <main class="main-content">
+
+    <!-- KPI Summary Row -->
+    <div class="kpi-grid">
+      <div class="kpi-card green">
+        <span class="kpi-label">Total Food Rescued</span>
+        <span class="kpi-value" id="kpi-rescued">0 kg</span>
+        <span class="kpi-subtext"><i class="fa-solid fa-leaf" style="color:var(--success)"></i> Synced across SAP & Salesforce</span>
+      </div>
+      <div class="kpi-card blue">
+        <span class="kpi-label">Salesforce Synced</span>
+        <span class="kpi-value" id="kpi-sf-synced">1 record</span>
+        <span class="kpi-subtext">Real-time webhook active</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Available Volunteers</span>
+        <span class="kpi-value" id="kpi-volunteers">25</span>
+        <span class="kpi-subtext">Ready for dispatch</span>
+      </div>
+      <div class="kpi-card">
+        <span class="kpi-label">Verified Places / NGOs</span>
+        <span class="kpi-value" id="kpi-recipients">17</span>
+        <span class="kpi-subtext">Shelters ready to receive</span>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 1: DONOR SECTION                       -->
+    <!-- ============================================== -->
+    <div id="tab-donor" class="tab-pane">
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-plus-circle" style="color:var(--donor-accent)"></i> Donor Portal: Register Surplus Food</h2>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Syncs directly to Salesforce Food_Donation__c</span>
+        </div>
+        <div class="card-body">
+          <form onsubmit="handleCreateDonation(event)">
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Donor Organization (Origin Place)</label>
+                <select id="donorSelect" class="form-control" onchange="onDonorChange()"></select>
+              </div>
+              <div class="form-group">
+                <label>City / Operating Metro *</label>
+                <select id="citySelect" class="form-control" required onchange="onCityChange()">
+                  <option value="Dallas">Dallas, TX</option>
+                  <option value="Houston">Houston, TX</option>
+                  <option value="Austin">Austin, TX</option>
+                  <option value="Chicago">Chicago, IL</option>
+                  <option value="New York">New York, NY</option>
+                  <option value="Seattle">Seattle, WA</option>
+                  <option value="Chennai">Chennai, India</option>
+                  <option value="Bengaluru">Bengaluru, India</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Food Type *</label>
+                <select id="foodType" class="form-control" required>
+                  <option value="Veg">Vegetarian Food</option>
+                  <option value="Both">Vegetarian & Non-Veg</option>
+                  <option value="Non-Veg">Non-Vegetarian Food</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Quantity (in kg) *</label>
+                <input type="number" id="quantityKg" class="form-control" value="100" min="1" required>
+              </div>
+              <div class="form-group">
+                <label>Usable Until (Date & Time) *</label>
+                <input type="datetime-local" id="usableUntil" class="form-control" required>
+              </div>
+            </div>
+            <div style="margin-top: 1.25rem; display: flex; gap: 12px; align-items: center;">
+              <button type="submit" class="btn btn-donor"><i class="fa-solid fa-paper-plane"></i> Submit Food Donation</button>
+              <span id="formMsg" style="font-size:0.85rem; font-weight:600;"></span>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Outbound Requests Table -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-clipboard-list"></i> Donor Outbound Food Requests</h2>
+          <button class="btn btn-outline btn-sm" onclick="fetchState()"><i class="fa-solid fa-arrows-rotate"></i> Refresh</button>
+        </div>
+        <div class="card-body" style="padding:0; overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Donation ID</th>
+                <th>Source</th>
+                <th>Donor Place</th>
+                <th>City</th>
+                <th>Food Type</th>
+                <th>Quantity</th>
+                <th>Auto-Matched Recipient</th>
+                <th>Auto-Assigned Volunteer</th>
+                <th>Live Status</th>
+              </tr>
+            </thead>
+            <tbody id="donorRequestsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 2: RECIPIENT SECTION (NGOs)            -->
+    <!-- ============================================== -->
+    <div id="tab-recipient" class="tab-pane" style="display:none;">
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-hand-holding-heart" style="color:var(--recipient-accent)"></i> Recipient / NGO Inbound Feed</h2>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Confirm Received is unlocked when volunteer confirms pickup</span>
+        </div>
+        <div class="card-body" style="padding:0; overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Donation ID</th>
+                <th>Matched Recipient Shelter</th>
+                <th>Origin Place (Donor)</th>
+                <th>City</th>
+                <th>Quantity</th>
+                <th>Assigned Volunteer</th>
+                <th>Delivery Stage</th>
+                <th>Receipt Confirmation</th>
+              </tr>
+            </thead>
+            <tbody id="recipientTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 3: VOLUNTEER SECTION                   -->
+    <!-- ============================================== -->
+    <div id="tab-volunteer" class="tab-pane" style="display:none;">
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-motorcycle" style="color:var(--volunteer-accent)"></i> Volunteer Field Logistics</h2>
+          <span style="font-size:0.8rem; color:var(--text-muted);">Pickups conveyed directly to field volunteers</span>
+        </div>
+        <div class="card-body" style="padding:0; overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>Donation ID</th>
+                <th>Assigned Volunteer</th>
+                <th>Operating City</th>
+                <th>Pickup Location &rarr; Dropoff Shelter Route</th>
+                <th>Quantity</th>
+                <th>Mission Status</th>
+                <th>Volunteer Action</th>
+              </tr>
+            </thead>
+            <tbody id="volunteerTasksTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 4: DELIVERY TRACKING                   -->
+    <!-- ============================================== -->
+    <div id="tab-tracking" class="tab-pane" style="display:none;">
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-route" style="color:var(--primary)"></i> Real-Time Delivery Tracking & Sequential Progress</h2>
+        </div>
+        <div class="card-body" id="deliveryTrackingContainer"></div>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 5: SALESFORCE INTEGRATION DASHBOARD    -->
+    <!-- ============================================== -->
+    <div id="tab-salesforce" class="tab-pane" style="display:none;">
+      <!-- Connection Status Card -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-brands fa-salesforce" style="color:var(--sf-blue)"></i> Salesforce Live Connection Status</h2>
+          <span class="badge-status badge-completed"><i class="fa-solid fa-circle-check"></i> Webhook Active</span>
+        </div>
+        <div class="card-body">
+          <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:1.25rem;">
+            <div style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem;">
+              <h3 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:8px;">Live Webhook Endpoint</h3>
+              <code style="background:#0f172a; color:#38bdf8; padding:6px 10px; border-radius:4px; font-size:0.8rem; display:block; word-break:break-all;">
+                https://theaters-eric-portable-recipient.trycloudflare.com/api/salesforce/webhook
+              </code>
+              <p style="font-size:0.78rem; color:#64748b; margin-top:8px;">Any JSON POST sent to this URL is immediately ingested into BiteShare.</p>
+            </div>
+
+            <div style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem;">
+              <h3 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:8px;">Test Salesforce Inbound Event</h3>
+              <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Simulate an Apex Trigger firing from your Salesforce Developer Org:</p>
+              <button class="btn btn-sf btn-sm" onclick="simulateSalesforcePush()"><i class="fa-brands fa-salesforce"></i> Push Sample Record from Salesforce</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Salesforce Code Snippets -->
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-code"></i> Setup In Your Salesforce Developer Org (2 Minutes)</h2>
+        </div>
+        <div class="card-body">
+          <p style="font-size:0.85rem; margin-bottom:12px; line-height:1.6;">
+            1. In Salesforce Setup, go to <strong>Remote Site Settings</strong> and whitelist <code>https://theaters-eric-portable-recipient.trycloudflare.com</code>.<br>
+            2. Open <strong>Developer Console</strong>, create an Apex class named <code>BiteShareCallout</code>, and an Apex Trigger on <code>Food_Donation__c</code>.
+          </p>
+          <div style="background:#0f172a; color:#38bdf8; padding:12px; border-radius:6px; font-family:monospace; font-size:0.8rem; max-height:200px; overflow-y:auto;">
+// Apex Trigger on Food_Donation__c
+trigger BiteShareWebhookTrigger on Food_Donation__c (after insert, after update) {
+    for (Food_Donation__c fd : Trigger.new) {
+        BiteShareCallout.syncDonationToSAP(
+            fd.Id, fd.Food_Type__c, fd.Quantity__c, fd.City__c, fd.Usable_Until__c, fd.Status__c
+        );
+    }
+}
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 6: VOLUNTEER POOL                      -->
+    <!-- ============================================== -->
+    <div id="tab-volunteers" class="tab-pane" style="display:none;">
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-users"></i> Distributed Volunteer Pool (25 Volunteers Across 8 Metros)</h2>
+        </div>
+        <div class="card-body" style="padding:0; overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Volunteer Name</th>
+                <th>Operating City</th>
+                <th>Contact Info</th>
+                <th>Duty Status</th>
+                <th>Deliveries Done</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="volunteersPoolTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 7: NGOs DETAILS                        -->
+    <!-- ============================================== -->
+    <div id="tab-recipients" class="tab-pane" style="display:none;">
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-building-ngo"></i> Verified Recipient Places & Shelters (17 Registered)</h2>
+        </div>
+        <div class="card-body" style="padding:0; overflow-x:auto;">
+          <table class="data-table">
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Shelter / NGO Name</th>
+                <th>City</th>
+                <th>Accepted Type</th>
+                <th>Max Capacity</th>
+                <th>Contact Email</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="ngosDetailsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- ============================================== -->
+    <!-- SECTION 8: IMPACT ANALYSIS                     -->
+    <!-- ============================================== -->
+    <div id="tab-analytics" class="tab-pane" style="display:none;">
+      <div class="content-card">
+        <div class="card-header">
+          <h2><i class="fa-solid fa-chart-column" style="color:var(--primary)"></i> Surplus Food Impact Analysis</h2>
+        </div>
+        <div class="card-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem;">
+            <div style="border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; background:#fff;">
+              <h3 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px; font-weight:700;"><i class="fa-solid fa-utensils"></i> Social & Ecological Impact</h3>
+              <div style="line-height:2.2; font-size:0.9rem;">
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">
+                  <span>Meals Distributed:</span>
+                  <strong style="color:var(--primary);" id="impact-meals">0 meals</strong>
+                </div>
+                <div style="display:flex; justify-content:space-between; border-bottom:1px solid #f1f5f9; padding-bottom:4px;">
+                  <span>CO₂ Offset:</span>
+                  <strong style="color:var(--success);" id="impact-co2">0 kg CO₂</strong>
+                </div>
+              </div>
+            </div>
+
+            <div style="border:1px solid var(--border); border-radius:var(--radius-md); padding:1.25rem; background:#fff;">
+              <h3 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:12px; font-weight:700;"><i class="fa-solid fa-city"></i> Food Rescued by City</h3>
+              <div id="chart-city-content" style="font-size:0.86rem; line-height:2;"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- System Event Log -->
+    <div class="content-card">
+      <div class="card-header">
+        <h2><i class="fa-solid fa-terminal" style="color:#38bdf8"></i> Automated System Log (Salesforce Webhooks & Dispatches)</h2>
+      </div>
+      <div class="card-body">
+        <div class="log-terminal" id="logStream"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    let CURRENT_STATE = { donations: [], recipients: [], volunteers: [], donors: [], deliveries: [], logs: [], salesforce_sync: {} };
+
+    const d = new Date();
+    d.setHours(d.getHours() + 6);
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset());
+    document.getElementById('usableUntil').value = d.toISOString().slice(0, 16);
+
+    function switchTab(tabName) {
+      document.querySelectorAll('.nav-item').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.tab-pane').forEach(p => p.style.display = 'none');
+
+      const el = event.currentTarget || event.target.closest('.nav-item');
+      if (el) el.classList.add('active');
+      document.getElementById('tab-' + tabName).style.display = 'block';
+    }
+
+    
+    const INITIAL_MASTER_STATE = {"donors": [{"id": "DNR-0001", "name": "Royal Palace Catering", "city": "Dallas", "donor_type": "Event", "email": "catering@royalpalace.com", "phone": "555-0101"}, {"id": "DNR-0002", "name": "Grand Plaza Hotel", "city": "Dallas", "donor_type": "Hotel", "email": "events@grandplaza.com", "phone": "555-0102"}, {"id": "DNR-0003", "name": "Bayou City Banquets", "city": "Houston", "donor_type": "Event", "email": "info@bayoubanquets.com", "phone": "555-0103"}, {"id": "DNR-0004", "name": "Houston Galleria Catering", "city": "Houston", "donor_type": "Restaurant", "email": "contact@galleriacater.com", "phone": "555-0104"}, {"id": "DNR-0005", "name": "Austin Tech Center Cafe", "city": "Austin", "donor_type": "College", "email": "cafe@austintech.com", "phone": "555-0105"}, {"id": "DNR-0006", "name": "Magnificent Mile Hotel", "city": "Chicago", "donor_type": "Hotel", "email": "dining@magmilehotel.com", "phone": "555-0106"}, {"id": "DNR-0007", "name": "Midtown Grand Ballroom", "city": "New York", "donor_type": "Event", "email": "events@midtowngrand.com", "phone": "555-0107"}, {"id": "DNR-0008", "name": "Seattle Convention Suites", "city": "Seattle", "donor_type": "Event", "email": "suites@seattleconv.com", "phone": "555-0108"}, {"id": "DNR-0009", "name": "Grand Chola Banquets", "city": "Chennai", "donor_type": "Hotel", "email": "banquets@grandchola.com", "phone": "555-0109"}, {"id": "DNR-0010", "name": "Whitefield Tech Cafeteria", "city": "Bengaluru", "donor_type": "College", "email": "food@whitefieldtech.com", "phone": "555-0110"}], "recipients": [{"id": "RCP-0001", "name": "Hope Community Shelter", "city": "Dallas", "food_type": "Both", "capacity_kg": 500, "is_verified": true, "contact_email": "hope@shelter.org", "phone": "555-0201"}, {"id": "RCP-0002", "name": "Green Earth Food Bank", "city": "Dallas", "food_type": "Veg", "capacity_kg": 300, "is_verified": true, "contact_email": "green@earthbank.org", "phone": "555-0202"}, {"id": "RCP-0003", "name": "North Texas Food Rescue", "city": "Dallas", "food_type": "Both", "capacity_kg": 800, "is_verified": true, "contact_email": "ntx@rescue.org", "phone": "555-0203"}, {"id": "RCP-0004", "name": "Houston Food Mission", "city": "Houston", "food_type": "Both", "capacity_kg": 650, "is_verified": true, "contact_email": "mission@houstonfood.org", "phone": "555-0204"}, {"id": "RCP-0005", "name": "Star of Hope Haven", "city": "Houston", "food_type": "Veg", "capacity_kg": 400, "is_verified": true, "contact_email": "star@hopehaven.org", "phone": "555-0205"}, {"id": "RCP-0006", "name": "Gulf Coast Community Pantry", "city": "Houston", "food_type": "Both", "capacity_kg": 1000, "is_verified": true, "contact_email": "gulfcoast@pantry.org", "phone": "555-0206"}, {"id": "RCP-0007", "name": "Austin Community Kitchen", "city": "Austin", "food_type": "Both", "capacity_kg": 450, "is_verified": true, "contact_email": "kitchen@austinrelief.org", "phone": "555-0207"}, {"id": "RCP-0008", "name": "Hill Country Relief Center", "city": "Austin", "food_type": "Veg", "capacity_kg": 250, "is_verified": true, "contact_email": "hillcountry@relief.org", "phone": "555-0208"}, {"id": "RCP-0009", "name": "Windy City Food Pantry", "city": "Chicago", "food_type": "Both", "capacity_kg": 750, "is_verified": true, "contact_email": "windycity@pantry.org", "phone": "555-0209"}, {"id": "RCP-0010", "name": "Midwest Care Shelter", "city": "Chicago", "food_type": "Veg", "capacity_kg": 350, "is_verified": true, "contact_email": "midwest@careshelter.org", "phone": "555-0210"}, {"id": "RCP-0011", "name": "City Harvest Outreach", "city": "New York", "food_type": "Both", "capacity_kg": 1200, "is_verified": true, "contact_email": "outreach@cityharvest.org", "phone": "555-0211"}, {"id": "RCP-0012", "name": "Bowery Mission Haven", "city": "New York", "food_type": "Veg", "capacity_kg": 500, "is_verified": true, "contact_email": "bowery@missionhaven.org", "phone": "555-0212"}, {"id": "RCP-0013", "name": "Puget Sound Food Bank", "city": "Seattle", "food_type": "Both", "capacity_kg": 600, "is_verified": true, "contact_email": "puget@foodbank.org", "phone": "555-0213"}, {"id": "RCP-0014", "name": "Annam Food Relief Foundation", "city": "Chennai", "food_type": "Veg", "capacity_kg": 800, "is_verified": true, "contact_email": "annam@relief.org", "phone": "555-0214"}, {"id": "RCP-0015", "name": "Karuna Community Kitchen", "city": "Chennai", "food_type": "Both", "capacity_kg": 500, "is_verified": true, "contact_email": "karuna@kitchen.org", "phone": "555-0215"}, {"id": "RCP-0016", "name": "Akshaya Food Network", "city": "Bengaluru", "food_type": "Veg", "capacity_kg": 1000, "is_verified": true, "contact_email": "akshaya@foodnet.org", "phone": "555-0216"}, {"id": "RCP-0017", "name": "Robin Hood Food Volunteers", "city": "Bengaluru", "food_type": "Both", "capacity_kg": 700, "is_verified": true, "contact_email": "robinhood@blrfund.org", "phone": "555-0217"}], "volunteers": [{"id": "VOL-0001", "name": "Alex Rivera", "city": "Dallas", "is_available": false, "email": "alex.rivera@volunteer.org", "phone": "555-0301", "deliveries_completed": 3}, {"id": "VOL-0002", "name": "Samira Khan", "city": "Dallas", "is_available": true, "email": "samira.khan@volunteer.org", "phone": "555-0302", "deliveries_completed": 1}, {"id": "VOL-0003", "name": "David Chen", "city": "Dallas", "is_available": true, "email": "david.chen@volunteer.org", "phone": "555-0303", "deliveries_completed": 0}, {"id": "VOL-0004", "name": "Maria Santos", "city": "Dallas", "is_available": true, "email": "maria.santos@volunteer.org", "phone": "555-0304", "deliveries_completed": 2}, {"id": "VOL-0005", "name": "Liam Johnson", "city": "Houston", "is_available": true, "email": "liam.j@volunteer.org", "phone": "555-0305", "deliveries_completed": 2}, {"id": "VOL-0006", "name": "Priya Patel", "city": "Houston", "is_available": true, "email": "priya.p@volunteer.org", "phone": "555-0306", "deliveries_completed": 4}, {"id": "VOL-0007", "name": "Marcus Williams", "city": "Houston", "is_available": true, "email": "marcus.w@volunteer.org", "phone": "555-0307", "deliveries_completed": 1}, {"id": "VOL-0008", "name": "Elena Rodriguez", "city": "Houston", "is_available": true, "email": "elena.r@volunteer.org", "phone": "555-0308", "deliveries_completed": 0}, {"id": "VOL-0009", "name": "Carlos Diaz", "city": "Austin", "is_available": true, "email": "carlos.diaz@volunteer.org", "phone": "555-0309", "deliveries_completed": 1}, {"id": "VOL-0010", "name": "Chloe Bennett", "city": "Austin", "is_available": true, "email": "chloe.b@volunteer.org", "phone": "555-0310", "deliveries_completed": 0}, {"id": "VOL-0011", "name": "Ryan Miller", "city": "Austin", "is_available": true, "email": "ryan.m@volunteer.org", "phone": "555-0311", "deliveries_completed": 2}, {"id": "VOL-0012", "name": "Noah Taylor", "city": "Chicago", "is_available": true, "email": "noah.t@volunteer.org", "phone": "555-0312", "deliveries_completed": 3}, {"id": "VOL-0013", "name": "Aaliyah Brooks", "city": "Chicago", "is_available": true, "email": "aaliyah.b@volunteer.org", "phone": "555-0313", "deliveries_completed": 1}, {"id": "VOL-0014", "name": "Ethan Davis", "city": "Chicago", "is_available": true, "email": "ethan.d@volunteer.org", "phone": "555-0314", "deliveries_completed": 0}, {"id": "VOL-0015", "name": "Daniel Kim", "city": "New York", "is_available": true, "email": "daniel.k@volunteer.org", "phone": "555-0315", "deliveries_completed": 5}, {"id": "VOL-0016", "name": "Olivia Brown", "city": "New York", "is_available": true, "email": "olivia.b@volunteer.org", "phone": "555-0316", "deliveries_completed": 2}, {"id": "VOL-0017", "name": "Lucas Silva", "city": "New York", "is_available": true, "email": "lucas.s@volunteer.org", "phone": "555-0317", "deliveries_completed": 1}, {"id": "VOL-0018", "name": "James Wilson", "city": "Seattle", "is_available": true, "email": "james.w@volunteer.org", "phone": "555-0318", "deliveries_completed": 2}, {"id": "VOL-0019", "name": "Emily White", "city": "Seattle", "is_available": true, "email": "emily.w@volunteer.org", "phone": "555-0319", "deliveries_completed": 0}, {"id": "VOL-0020", "name": "Karthik Raman", "city": "Chennai", "is_available": true, "email": "karthik.r@volunteer.org", "phone": "555-0320", "deliveries_completed": 6}, {"id": "VOL-0021", "name": "Divya Suresh", "city": "Chennai", "is_available": true, "email": "divya.s@volunteer.org", "phone": "555-0321", "deliveries_completed": 2}, {"id": "VOL-0022", "name": "Vignesh Kumar", "city": "Chennai", "is_available": true, "email": "vignesh.k@volunteer.org", "phone": "555-0322", "deliveries_completed": 3}, {"id": "VOL-0023", "name": "Rohan Sharma", "city": "Bengaluru", "is_available": true, "email": "rohan.s@volunteer.org", "phone": "555-0323", "deliveries_completed": 4}, {"id": "VOL-0024", "name": "Ananya Rao", "city": "Bengaluru", "is_available": true, "email": "ananya.r@volunteer.org", "phone": "555-0324", "deliveries_completed": 1}, {"id": "VOL-0025", "name": "Arvind Swamy", "city": "Bengaluru", "is_available": true, "email": "arvind.s@volunteer.org", "phone": "555-0325", "deliveries_completed": 2}], "donations": [{"donation_id": "FD-0001", "salesforce_id": "a001200000X9A4EAA1", "food_type": "Veg", "quantity_kg": 100, "city": "Dallas", "usable_until": "2026-10-22T04:01:10.889277", "donor_id": "DNR-0001", "recipient_id": "RCP-0001", "volunteer_id": "VOL-0001", "status": "VOL_ASSIGNED", "source": "Salesforce Connected App", "created_at": "22:01:10"}], "deliveries": [{"delivery_id": "PD-0001", "donation_id": "FD-0001", "pickup_time": null, "delivery_time": null, "status": "PENDING"}], "salesforce_sync": {"connected": true, "org_name": "Salesforce Developer Edition", "instance_url": "https://developer.salesforce.com", "webhook_endpoint": "https://theaters-eric-portable-recipient.trycloudflare.com/api/salesforce/webhook", "total_synced_records": 1, "last_sync_time": "22:01:10", "sync_mode": "Bi-Directional Auto-Sync"}, "logs": [{"time": "22:01:10", "category": "SALESFORCE_BRIDGE", "message": "Salesforce Integration Active. Listening for Food_Donation__c webhooks."}], "next_donation_num": 2, "next_delivery_num": 2};
+
+    function initClientState() {
+      window.HAS_INIT_CLIENT_STATE = true;
+      const saved = localStorage.getItem('BITESHARE_STATE');
+      if (saved) {
+        try {
+          CURRENT_STATE = JSON.parse(saved);
+          return;
+        } catch(e) {}
+      }
+      CURRENT_STATE = JSON.parse(JSON.stringify(INITIAL_MASTER_STATE));
+      saveClientState();
+    }
+
+    function saveClientState() {
+      localStorage.setItem('BITESHARE_STATE', JSON.stringify(CURRENT_STATE));
+    }
+
+    function addClientLog(category, message, details) {
+      CURRENT_STATE.logs.unshift({
+        time: new Date().toTimeString().slice(0, 8),
+        category: category,
+        message: message,
+        details: details || null
+      });
+      if (CURRENT_STATE.logs.length > 50) CURRENT_STATE.logs.pop();
+    }
+
+    async function fetchState() {
+      try {
+        const res = await fetch('/api/state');
+        if (!res.ok) throw new Error('API not available');
+        CURRENT_STATE = await res.json();
+        renderUI(CURRENT_STATE);
+      } catch (err) {
+        if (!window.HAS_INIT_CLIENT_STATE) {
+          initClientState();
+        }
+        renderUI(CURRENT_STATE);
+      }
+    }
+
+    async function handleCreateDonation(e) {
+      e.preventDefault();
+      const msg = document.getElementById('formMsg');
+      msg.innerText = '';
+
+      const payload = {
+        food_type: document.getElementById('foodType').value,
+        quantity_kg: Number(document.getElementById('quantityKg').value),
+        city: document.getElementById('citySelect').value,
+        usable_until: document.getElementById('usableUntil').value,
+        donor_id: document.getElementById('donorSelect').value
+      };
+
+      try {
+        const res = await fetch('/api/donation/create', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(payload)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          msg.style.color = '#10b981';
+          msg.innerText = 'Created ' + data.donation_id + '! Matched to shelter & volunteer dispatched automatically.';
+          fetchState();
+          return;
+        }
+      } catch(e) {}
+
+      // Client-side fallback logic
+      const donId = 'FD-' + String(CURRENT_STATE.next_donation_num++).padStart(4, '0');
+      const newDon = {
+        donation_id: donId,
+        salesforce_id: null,
+        food_type: payload.food_type,
+        quantity_kg: payload.quantity_kg,
+        city: payload.city,
+        usable_until: payload.usable_until,
+        donor_id: payload.donor_id,
+        recipient_id: null,
+        volunteer_id: null,
+        status: 'REQUESTED',
+        source: 'Web Portal',
+        created_at: new Date().toTimeString().slice(0, 8)
+      };
+
+      addClientLog('DONATION_CREATED', 'New surplus donation ' + donId + ' created in ' + payload.city);
+
+      // Match recipient
+      const recips = CURRENT_STATE.recipients.filter(r => r.city.toLowerCase() === payload.city.toLowerCase() && r.is_verified);
+      const eligible = recips.filter(r => (r.food_type === 'Both' || r.food_type === payload.food_type) && r.capacity_kg >= payload.quantity_kg);
+      const chosenRecip = eligible.length > 0 ? eligible[0] : (recips.length > 0 ? recips[0] : null);
+
+      if (chosenRecip) {
+        newDon.recipient_id = chosenRecip.id;
+        newDon.status = 'MATCHED';
+        addClientLog('AUTO_MATCH', 'Auto-matched ' + donId + ' to ' + chosenRecip.name + ' in ' + payload.city);
+
+        // Match volunteer
+        const vols = CURRENT_STATE.volunteers.filter(v => v.city.toLowerCase() === payload.city.toLowerCase() && v.is_available);
+        if (vols.length > 0) {
+          vols.sort((a,b) => (a.deliveries_completed || 0) - (b.deliveries_completed || 0));
+          const chosenVol = vols[0];
+          newDon.volunteer_id = chosenVol.id;
+          newDon.status = 'VOL_ASSIGNED';
+          chosenVol.is_available = false;
+
+          const delId = 'PD-' + String(CURRENT_STATE.next_delivery_num++).padStart(4, '0');
+          CURRENT_STATE.deliveries.push({
+            delivery_id: delId,
+            donation_id: donId,
+            pickup_time: null,
+            delivery_time: null,
+            status: 'PENDING'
+          });
+          addClientLog('CONVEY_TO_VOLUNTEER', 'DISPATCH conveyed to ' + chosenVol.name + ': Pick up ' + donId + ' & deliver to ' + chosenRecip.name);
+        }
+      }
+
+      CURRENT_STATE.donations.push(newDon);
+      saveClientState();
+      msg.style.color = '#10b981';
+      msg.innerText = 'Created ' + donId + '! Matched to shelter & volunteer dispatched automatically.';
+      renderUI(CURRENT_STATE);
+    }
+
+    async function triggerAction(donationId, action) {
+      try {
+        const res = await fetch('/api/donation/action', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ donation_id: donationId, action: action })
+        });
+        if (res.ok) {
+          fetchState();
+          return;
+        }
+      } catch(e) {}
+
+      // Client-side fallback action
+      const don = CURRENT_STATE.donations.find(d => d.donation_id === donationId);
+      if (!don) return;
+
+      if (action === 'pickup') {
+        don.status = 'PICKED_UP';
+        const del = CURRENT_STATE.deliveries.find(d => d.donation_id === donationId);
+        if (del) {
+          del.status = 'PICKED_UP';
+          del.pickup_time = new Date().toISOString();
+        }
+        addClientLog('PICKUP_CONFIRMED', 'Volunteer confirmed pickup for ' + donationId + '. Food is now in transit.');
+      } else if (action === 'deliver') {
+        if (don.status !== 'PICKED_UP') {
+          alert('Sequence Validation Error: The recipient cannot confirm receipt until the delivery volunteer has confirmed pickup from the donor.');
+          return;
+        }
+        don.status = 'COMPLETED';
+        if (don.volunteer_id) {
+          const vol = CURRENT_STATE.volunteers.find(v => v.id === don.volunteer_id);
+          if (vol) {
+            vol.is_available = true;
+            vol.deliveries_completed = (vol.deliveries_completed || 0) + 1;
+          }
+        }
+        const del = CURRENT_STATE.deliveries.find(d => d.donation_id === donationId);
+        if (del) {
+          del.status = 'DELIVERED';
+          del.delivery_time = new Date().toISOString();
+        }
+        addClientLog('DELIVERY_CONFIRMED', 'Recipient confirmed receipt of ' + donationId + ' (' + don.quantity_kg + ' kg). Mission complete.');
+      }
+      saveClientState();
+      renderUI(CURRENT_STATE);
+    }
+
+    async function toggleVolunteer(volId) {
+      try {
+        const res = await fetch('/api/volunteer/toggle', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ volunteer_id: volId })
+        });
+        if (res.ok) {
+          fetchState();
+          return;
+        }
+      } catch(e) {}
+
+      const vol = CURRENT_STATE.volunteers.find(v => v.id === volId);
+      if (vol) {
+        vol.is_available = !vol.is_available;
+        addClientLog('VOLUNTEER_STATUS', 'Volunteer ' + vol.name + ' availability changed to: ' + (vol.is_available ? 'Available' : 'Busy'));
+        saveClientState();
+        renderUI(CURRENT_STATE);
+      }
+    }
+
+    async function simulateSalesforcePush() {
+      try {
+        const randomQty = Math.floor(Math.random() * 80) + 100;
+        const cities = ['Dallas', 'Houston', 'Austin', 'Chennai'];
+        const randomCity = cities[Math.floor(Math.random() * cities.length)];
+        const randomSfId = 'a001200000' + Math.random().toString(36).substring(2, 9).toUpperCase();
+
+        const sfPayload = {
+          salesforce_id: randomSfId,
+          food_type: 'Veg',
+          quantity_kg: randomQty,
+          city: randomCity,
+          usable_until: new Date(Date.now() + 6 * 3600 * 1000).toISOString(),
+          status: 'Submitted',
+          source: 'Salesforce Apex Callout'
+        };
+
+        const res = await fetch('/api/salesforce/webhook', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify(sfPayload)
+        });
+        if (res.ok) {
+          const data = await res.json();
+          alert('Success! Simulated Salesforce Apex Callout received.
+Created: ' + data.donation_id + '
+Salesforce ID: ' + data.salesforce_id);
+          fetchState();
+          return;
+        }
+      } catch(e) {}
+
+      // Client-side fallback simulation
+      const randomQty = Math.floor(Math.random() * 80) + 100;
+      const cities = ['Dallas', 'Houston', 'Austin', 'Chennai'];
+      const randomCity = cities[Math.floor(Math.random() * cities.length)];
+      const randomSfId = 'a001200000' + Math.random().toString(36).substring(2, 9).toUpperCase();
+
+      const donId = 'FD-' + String(CURRENT_STATE.next_donation_num++).padStart(4, '0');
+      const sfDon = {
+        donation_id: donId,
+        salesforce_id: randomSfId,
+        food_type: 'Veg',
+        quantity_kg: randomQty,
+        city: randomCity,
+        usable_until: new Date(Date.now() + 6 * 3600 * 1000).toISOString(),
+        donor_id: 'DNR-0001',
+        recipient_id: null,
+        volunteer_id: null,
+        status: 'REQUESTED',
+        source: 'Salesforce Apex Callout',
+        created_at: new Date().toTimeString().slice(0, 8)
+      };
+
+      const recips = CURRENT_STATE.recipients.filter(r => r.city.toLowerCase() === randomCity.toLowerCase());
+      if (recips.length > 0) {
+        sfDon.recipient_id = recips[0].id;
+        sfDon.status = 'MATCHED';
+        const vols = CURRENT_STATE.volunteers.filter(v => v.city.toLowerCase() === randomCity.toLowerCase() && v.is_available);
+        if (vols.length > 0) {
+          const chosenVol = vols[0];
+          sfDon.volunteer_id = chosenVol.id;
+          sfDon.status = 'VOL_ASSIGNED';
+          chosenVol.is_available = false;
+
+          CURRENT_STATE.deliveries.push({
+            delivery_id: 'PD-' + String(CURRENT_STATE.next_delivery_num++).padStart(4, '0'),
+            donation_id: donId,
+            pickup_time: null,
+            delivery_time: null,
+            status: 'PENDING'
+          });
+        }
+      }
+
+      CURRENT_STATE.donations.push(sfDon);
+      CURRENT_STATE.salesforce_sync.total_synced_records = (CURRENT_STATE.salesforce_sync.total_synced_records || 0) + 1;
+      CURRENT_STATE.salesforce_sync.last_sync_time = new Date().toTimeString().slice(0, 8);
+      addClientLog('SALESFORCE_BRIDGE', 'Salesforce Webhook processed for ' + randomSfId + ' (' + randomCity + ') &bull; ' + donId);
+      saveClientState();
+      renderUI(CURRENT_STATE);
+      alert('Success! Simulated Salesforce Apex Callout received.
+Created: ' + donId + '
+Salesforce ID: ' + randomSfId + '
+City: ' + randomCity + ' (' + randomQty + ' kg)');
+    }
+
+    async function resetDemo() {
+      localStorage.removeItem('BITESHARE_STATE');
+      CURRENT_STATE = JSON.parse(JSON.stringify(INITIAL_MASTER_STATE));
+      saveClientState();
+      renderUI(CURRENT_STATE);
+    }
+
+    fetchState();
+    setInterval(fetchState, 3000);
+  </script>
+</body>
+</html>
