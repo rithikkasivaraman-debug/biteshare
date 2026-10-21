@@ -1,0 +1,4 @@
+ID;name;city;foodType;capacityKg;isVerified;contactEmail;phone
+RCP-0001;Hope Community Shelter;Dallas;Both;500;true;hope@shelter.org;555-0201
+RCP-0002;Green Earth Food Bank;Dallas;Veg;200;true;green@earthbank.org;555-0202
+RCP-0003;Metro Relief Center;Austin;Both;100;false;metro@relief.org;555-0203

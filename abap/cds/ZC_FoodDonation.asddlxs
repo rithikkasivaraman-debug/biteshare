@@ -1,0 +1,82 @@
+@Metadata.layer: #CUSTOMER
+@UI: {
+  headerInfo: {
+    typeName: 'Food Donation',
+    typeNamePlural: 'Food Donations',
+    title: { type: #STANDARD, value: 'DonationId' },
+    description: { value: 'City' }
+  }
+}
+annotate view ZC_FoodDonation with
+{
+  @UI.facet: [
+    {
+      id: 'GeneralHeader',
+      purpose: #STANDARD,
+      type: #IDENTIFICATION_REFERENCE,
+      label: 'Donation Overview',
+      position: 10
+    },
+    {
+      id: 'DeliveriesSection',
+      purpose: #STANDARD,
+      type: #LINEITEM_REFERENCE,
+      label: 'Pickup & Delivery Tracking',
+      position: 20,
+      targetElement: '_Deliveries'
+    }
+  ]
+
+  @UI: {
+    lineItem: [{ position: 10, label: 'Donation ID' }],
+    identification: [{ position: 10, label: 'Donation ID' }]
+  }
+  DonationId;
+
+  @UI: {
+    lineItem: [{ position: 20, label: 'Food Type' }],
+    identification: [{ position: 20, label: 'Food Type (Veg / Non-Veg)' }],
+    selectionField: [{ position: 10 }]
+  }
+  FoodType;
+
+  @UI: {
+    lineItem: [{ position: 30, label: 'Quantity (kg)' }],
+    identification: [{ position: 30, label: 'Quantity (kg)' }]
+  }
+  QuantityKg;
+
+  @UI: {
+    lineItem: [{ position: 40, label: 'City' }],
+    identification: [{ position: 40, label: 'City' }],
+    selectionField: [{ position: 20 }]
+  }
+  City;
+
+  @UI: {
+    lineItem: [{ position: 50, label: 'Usable Until' }],
+    identification: [{ position: 50, label: 'Usable Until' }]
+  }
+  UsableUntil;
+
+  @UI: {
+    lineItem: [
+      { position: 60, label: 'Status' },
+      { type: #FOR_ACTION, dataAction: 'acceptDonation', label: 'Recipient Accept', position: 10 },
+      { type: #FOR_ACTION, dataAction: 'markPickedUp', label: 'Confirm Picked Up', position: 20 },
+      { type: #FOR_ACTION, dataAction: 'markDelivered', label: 'Confirm Delivered', position: 30 }
+    ],
+    identification: [{ position: 60, label: 'Status' }],
+    selectionField: [{ position: 30 }]
+  }
+  Status;
+
+  @UI.identification: [{ position: 70, label: 'Donor ID' }]
+  DonorId;
+
+  @UI.identification: [{ position: 80, label: 'Matched Recipient ID' }]
+  RecipientId;
+
+  @UI.identification: [{ position: 90, label: 'Assigned Volunteer ID' }]
+  VolunteerId;
+}

@@ -1,0 +1,9 @@
+@EndUserText.label: 'BiteShare Food Sharing OData V4 Service'
+define service ZUI_BITESHARE_O4 {
+  expose ZC_FoodDonation     as FoodDonations;
+  expose ZC_PickupDelivery   as PickupDeliveries;
+  expose ZI_Donor            as Donors;
+  expose ZI_Recipient        as Recipients;
+  expose ZI_Volunteer        as Volunteers;
+  expose ZC_BiteShare_Analytics as Analytics;
+}

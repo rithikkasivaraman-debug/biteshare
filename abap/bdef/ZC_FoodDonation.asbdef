@@ -1,0 +1,23 @@
+projection;
+strict ( 2 );
+
+define behavior for ZC_FoodDonation alias FoodDonation
+{
+  use create;
+  use update;
+  use delete;
+
+  use association _Deliveries { create; }
+
+  use action acceptDonation;
+  use action markPickedUp;
+  use action markDelivered;
+}
+
+define behavior for ZC_PickupDelivery alias Delivery
+{
+  use update;
+  use delete;
+
+  use association _Donation;
+}

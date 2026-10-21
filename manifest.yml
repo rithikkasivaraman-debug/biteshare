@@ -1,0 +1,10 @@
+---
+applications:
+  - name: biteshare-sap
+    random-route: true
+    memory: 256M
+    disk_quota: 512M
+    buildpack: python_buildpack
+    command: python server.py
+    health-check-type: http
+    health-check-http-endpoint: /api/state

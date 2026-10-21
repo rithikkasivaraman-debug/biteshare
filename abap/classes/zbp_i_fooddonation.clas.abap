@@ -1,0 +1,9 @@
+CLASS zbp_i_fooddonation DEFINITION
+  PUBLIC
+  ABSTRACT
+  FINAL
+  FOR BEHAVIOR OF zi_fooddonation.
+ENDCLASS.
+
+CLASS zbp_i_fooddonation IMPLEMENTATION.
+ENDCLASS.

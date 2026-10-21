@@ -1,0 +1,67 @@
+managed implementation in class zbp_i_fooddonation unique;
+strict ( 2 );
+
+define behavior for ZI_FoodDonation alias FoodDonation
+persistent table zbt_donation
+lock master
+authorization master ( global )
+etag master LastChangedAt
+early numbering
+{
+  create;
+  update;
+  delete;
+
+  association _Deliveries { create; }
+
+  // Phase 4: Validation Rules
+  validation validateQuantity on save { field QuantityKg; create; update; }
+  validation validateUsableTime on save { field UsableUntil; create; update; }
+  validation validateMandatoryFields on save { field FoodType, City; create; }
+
+  // Phase 5: Flow 1 (Auto-Match Recipient on creation)
+  determination matchRecipient on modify { field City, QuantityKg, FoodType; create; }
+
+  // User Actions to drive lifecycle
+  action acceptDonation result [1] $self;
+  action markPickedUp result [1] $self;
+  action markDelivered result [1] $self;
+
+  mapping for zbt_donation
+  {
+    DonationId    = donation_id;
+    FoodType      = food_type;
+    QuantityKg    = quantity_kg;
+    City          = city;
+    UsableUntil   = usable_until;
+    Status        = status;
+    DonorId       = donor_id;
+    RecipientId   = recipient_id;
+    VolunteerId   = volunteer_id;
+    CreatedBy     = created_by;
+    CreatedAt     = created_at;
+    LastChangedAt = last_changed_at;
+  }
+}
+
+define behavior for ZI_PickupDelivery alias Delivery
+persistent table zbt_delivery
+lock dependent by _Donation
+authorization dependent by _Donation
+early numbering
+{
+  update;
+  delete;
+
+  field ( readonly ) DonationId;
+  association _Donation;
+
+  mapping for zbt_delivery
+  {
+    DeliveryId   = delivery_id;
+    DonationId   = donation_id;
+    PickupTime   = pickup_time;
+    DeliveryTime = delivery_time;
+    Status       = status;
+  }
+}

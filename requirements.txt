@@ -1,0 +1,1 @@
+# BiteShare SAP Platform is self-contained using Python standard library
