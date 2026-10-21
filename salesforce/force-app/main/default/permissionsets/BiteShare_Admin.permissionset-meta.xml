@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
+    <hasActivationRequired>false</hasActivationRequired>
+    <label>BiteShare Admin</label>
+    <description>Full access to all BiteShare Surplus Food objects and operations</description>
+    <tabSettings><tab>Donor__c</tab><visibility>Visible</visibility></tabSettings>
+    <tabSettings><tab>Recipient_Organization__c</tab><visibility>Visible</visibility></tabSettings>
+    <tabSettings><tab>Volunteer__c</tab><visibility>Visible</visibility></tabSettings>
+    <tabSettings><tab>Food_Donation__c</tab><visibility>Visible</visibility></tabSettings>
+    <tabSettings><tab>Pickup_Delivery__c</tab><visibility>Visible</visibility></tabSettings>
+</PermissionSet>

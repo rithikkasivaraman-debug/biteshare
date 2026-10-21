@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Status__c</fullName><label>Status</label><required>true</required><type>Picklist</type>
+    <valueSet>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>Submitted</fullName><default>true</default><label>Submitted</label></value>
+            <value><fullName>Matched</fullName><default>false</default><label>Matched</label></value>
+            <value><fullName>Accepted</fullName><default>false</default><label>Accepted</label></value>
+            <value><fullName>Volunteer Assigned</fullName><default>false</default><label>Volunteer Assigned</label></value>
+            <value><fullName>Picked Up</fullName><default>false</default><label>Picked Up</label></value>
+            <value><fullName>Delivered</fullName><default>false</default><label>Delivered</label></value>
+            <value><fullName>Completed</fullName><default>false</default><label>Completed</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

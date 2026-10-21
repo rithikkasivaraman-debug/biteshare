@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomObject xmlns="http://soap.sforce.com/2006/04/metadata">
+    <actionOverrides><actionName>Accept</actionName><type>Default</type></actionOverrides>
+    <deploymentStatus>Deployed</deploymentStatus>
+    <description>Central surplus food donation tracking object</description>
+    <enableActivities>true</enableActivities>
+    <enableReports>true</enableReports>
+    <enableSearch>true</enableSearch>
+    <label>Food Donation</label>
+    <nameField>
+        <displayFormat>FD-{0000}</displayFormat>
+        <label>Donation Number</label>
+        <type>AutoNumber</type>
+    </nameField>
+    <pluralLabel>Food Donations</pluralLabel>
+    <sharingModel>ReadWrite</sharingModel>
+</CustomObject>

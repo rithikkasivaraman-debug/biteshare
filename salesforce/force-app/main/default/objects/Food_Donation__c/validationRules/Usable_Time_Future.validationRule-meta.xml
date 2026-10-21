@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Usable_Time_Future</fullName>
+    <active>true</active>
+    <description>Usable Until must be a future time</description>
+    <errorConditionFormula>Usable_Until__c &lt; NOW()</errorConditionFormula>
+    <errorDisplayField>Usable_Until__c</errorDisplayField>
+    <errorMessage>Usable Until must be a future time.</errorMessage>
+</ValidationRule>

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <brand>
+        <headerColor>#0284C7</headerColor>
+        <shouldOverrideOrgTheme>false</shouldOverrideOrgTheme>
+    </brand>
+    <description>BiteShare Surplus Food Sharing &amp; Volunteer Logistics Platform</description>
+    <formFactors>Large</formFactors>
+    <formFactors>Small</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <label>BiteShare</label>
+    <navType>Standard</navType>
+    <tabs>standard-home</tabs>
+    <tabs>Donor__c</tabs>
+    <tabs>Recipient_Organization__c</tabs>
+    <tabs>Volunteer__c</tabs>
+    <tabs>Food_Donation__c</tabs>
+    <tabs>Pickup_Delivery__c</tabs>
+    <tabs>standard-report</tabs>
+    <tabs>standard-Dashboard</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>
