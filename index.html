@@ -4,6 +4,15 @@
   <meta charset="UTF-8">
   <title>BiteShare | Connected to Salesforce</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#0284c7">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="BiteShare">
+  <link rel="apple-touch-icon" href="icon-192.png">
+  <link rel="icon" type="image/png" href="icon-192.png">
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -241,6 +250,7 @@
       </div>
     </div>
     <div class="header-actions">
+      <button id="pwaInstallBtn" class="btn btn-primary btn-sm" style="display:none; background:#10b981;" onclick="installPWA()"><i class="fa-solid fa-download"></i> Install App</button>
       <button class="btn btn-sf btn-sm" onclick="simulateSalesforcePush()"><i class="fa-brands fa-salesforce"></i> Push from Salesforce (Simulate)</button>
       <button class="btn btn-outline btn-sm" style="color:#fff; border-color:#475569;" onclick="resetDemo()"><i class="fa-solid fa-rotate-right"></i> Reset</button>
     </div>
@@ -479,7 +489,8 @@
             <div style="background:#f8fafc; border:1px solid var(--border); border-radius:var(--radius-sm); padding:1rem;">
               <h3 style="font-size:0.9rem; color:var(--text-muted); margin-bottom:8px;">Test Salesforce Inbound Event</h3>
               <p style="font-size:0.8rem; color:#64748b; margin-bottom:10px;">Simulate an Apex Trigger firing from your Salesforce Developer Org:</p>
-              <button class="btn btn-sf btn-sm" onclick="simulateSalesforcePush()"><i class="fa-brands fa-salesforce"></i> Push Sample Record from Salesforce</button>
+              <button id="pwaInstallBtn" class="btn btn-primary btn-sm" style="display:none; background:#10b981;" onclick="installPWA()"><i class="fa-solid fa-download"></i> Install App</button>
+      <button class="btn btn-sf btn-sm" onclick="simulateSalesforcePush()"><i class="fa-brands fa-salesforce"></i> Push Sample Record from Salesforce</button>
             </div>
           </div>
         </div>
@@ -926,5 +937,36 @@ City: ' + randomCity + ' (' + randomQty + ' kg)');
     fetchState();
     setInterval(fetchState, 3000);
   </script>
+
+  <script>
+    let deferredPrompt;
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault();
+      deferredPrompt = e;
+      const btn = document.getElementById('pwaInstallBtn');
+      if (btn) btn.style.display = 'inline-flex';
+    });
+
+    async function installPWA() {
+      if (!deferredPrompt) {
+        alert('To install on your phone or PC, open your browser menu (3 dots) and tap "Install BiteShare" or "Add to Home screen"!');
+        return;
+      }
+      deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      if (outcome === 'accepted') {
+        const btn = document.getElementById('pwaInstallBtn');
+        if (btn) btn.style.display = 'none';
+      }
+      deferredPrompt = null;
+    }
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(err => console.log('SW error', err));
+      });
+    }
+  </script>
+
 </body>
 </html>
